@@ -51,9 +51,9 @@ allprojects {
 
 	group = 'reactor.quickstart'
 	repositories {
-		mavenLocal()
 		maven { url 'http://repo.springsource.org/libs-release' }
 		maven { url 'http://repo.springsource.org/libs-snapshot' }
+		mavenLocal()
 		mavenCentral()
 	}
 }
