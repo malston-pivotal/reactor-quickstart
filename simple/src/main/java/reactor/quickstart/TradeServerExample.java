@@ -3,6 +3,7 @@ package reactor.quickstart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.Fn;
+import reactor.core.R;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
@@ -22,7 +23,7 @@ public class TradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the default Dispatcher
-		Reactor reactor = new Reactor();
+		Reactor reactor = R.create();
 
 		// Create a single Selector for efficiency
 		Selector trade = $("trade.execute");
