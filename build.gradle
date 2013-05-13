@@ -106,9 +106,21 @@ project('groovy') {
 	description = 'Reactor quickstart Groovy example'
 	dependencies {
 		compile project(':core')
+
 		compile 'reactor:reactor-groovy:1.0.0.BUILD-SNAPSHOT'
 	}
+}
 
+project('websocket') {
+	description = 'Reactor quickstart websocket example'
+	dependencies {
+		compile project(':core')
+
+		// WebSocket support
+		compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
+		compile "org.eclipse.jetty.websocket:websocket-server:$jettyVersion"
+		compile("javax.net.websocket:javax.net.websocket-api:1.0-b08", provided)
+	}
 }
 
 
