@@ -1,6 +1,6 @@
 # Reactor quickstart
 
-These examples are just some quick sketches of what you can do with Reactor. They should how to consume events, how to publish them, how use different Dispatchers for different processing tasks, and how to compose actions around data streams.
+These examples are just some quick sketches of what you can do with Reactor. They show how to consume events, how to publish them, how to use different Dispatchers for different processing tasks, and how to compose actions around data streams.
 
 ### Build
 
@@ -20,4 +20,4 @@ The components include:
 
 ### License
 
-These samples, as is Reactor, are all Apache 2.0 licensed.
+Like Reactor, these samples are all [Apache 2.0 licensed](http://www.apache.org/licenses/LICENSE-2.0.html).
