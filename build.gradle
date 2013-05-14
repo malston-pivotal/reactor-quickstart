@@ -42,7 +42,6 @@ apply from: "$gradleScriptDir/setup.gradle"
 
 allprojects {
 	apply plugin: 'idea'
-	apply plugin: 'eclipse'
 
 	configurations.all {
 		exclude group: 'commons-logging'
@@ -60,6 +59,7 @@ allprojects {
 
 subprojects { subproject ->
 	apply plugin: 'java'
+	apply plugin: 'eclipse'
 
 	sourceCompatibility = 7
 	targetCompatibility = 7
