@@ -44,8 +44,10 @@ public class WebSocketTradeServerExample {
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
 		final Reactor serverReactor = new Reactor(Context.rootDispatcher());
 
-		// Create a single Selector for efficiency
-		final Selector tradeExecute = $("trade.execute");
+
+		// Create a single key and Selector for efficiency
+		final String tradeExecuteKey = "trade.execute";
+		final Selector tradeExecute = $(tradeExecuteKey);
 
 		// For each Trade event, execute that on the server and notify connected clients
 		// because each client that connects links to the serverReactor
@@ -123,7 +125,7 @@ public class WebSocketTradeServerExample {
 			Trade t = server.nextTrade();
 
 			// Notify the Reactor the event is ready to be handled
-			serverReactor.notify(tradeExecute, Fn.event(t));
+			serverReactor.notify(tradeExecuteKey, Fn.event(t));
 		}
 
 		// Stop throughput timer and output metrics
