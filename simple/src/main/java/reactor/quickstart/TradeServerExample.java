@@ -25,9 +25,10 @@ public class TradeServerExample {
 		// Use a Reactor to dispatch events using the default Dispatcher
 		Reactor reactor = R.create();
 
+		String topic = "trade.execute";
 
 		// For each Trade event, execute that on the server
-		reactor.on($("trade.execute"), new Consumer<Event<Trade>>() {
+		reactor.on($(topic), new Consumer<Event<Trade>>() {
 			@Override
 			public void accept(Event<Trade> tradeEvent) {
 				server.execute(tradeEvent.getData());
@@ -46,7 +47,7 @@ public class TradeServerExample {
 			Trade t = server.nextTrade();
 
 			// Notify the Reactor the event is ready to be handled
-			reactor.notify("trade.execute", Fn.event(t));
+			reactor.notify(topic, Fn.event(t));
 		}
 
 		// Stop throughput timer and output metrics

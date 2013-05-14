@@ -41,8 +41,10 @@ void test() {
 	// Use a Reactor to dispatch events using the default Dispatcher
 	def reactor = R.create()
 
+	def topic = 'trade.execute'
+
 	// For each Trade event, execute that on the server
-	reactor.on($('trade.execute')) { Event<Trade> tradeEvent ->
+	reactor.on($(topic)) { Event<Trade> tradeEvent ->
 		server.execute tradeEvent.data
 
 		// Since we're async, for this test, use a latch to tell when we're done
@@ -56,7 +58,7 @@ void test() {
 	for (int i in 0..totalTrades) {
 
 		// Notify the Reactor the next randomly-generated Trade from server is ready to be handled
-		reactor.notify 'trade.execute', server.nextTrade()
+		reactor.notify topic, server.nextTrade()
 	}
 
 	// Stop throughput timer and output metrics
