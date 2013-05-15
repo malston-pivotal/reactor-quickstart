@@ -1,12 +1,11 @@
 /**
  * @author Stephane Maldini
  */
+
 import groovy.transform.CompileStatic
 import reactor.core.R
-import reactor.fn.Event
-
-import reactor.quickstart.TradeServer
 import reactor.quickstart.Trade
+import reactor.quickstart.TradeServer
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -44,8 +43,8 @@ void test() {
 	def topic = 'trade.execute'
 
 	// For each Trade event, execute that on the server
-	reactor.on($(topic)) { Event<Trade> tradeEvent ->
-		server.execute tradeEvent.data
+	reactor.on($(topic)) { Trade trade ->
+		server.execute trade
 
 		// Since we're async, for this test, use a latch to tell when we're done
 		latch.countDown()
