@@ -1,5 +1,15 @@
 package reactor.quickstart;
 
+import static reactor.Fn.$;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.servlet.http.HttpServlet;
+
 import org.eclipse.jetty.io.MappedByteBufferPool;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -17,23 +27,14 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.Fn;
-import reactor.core.Context;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
 import reactor.fn.Registration;
 import reactor.fn.Selector;
-
-import javax.servlet.http.HttpServlet;
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static reactor.Fn.$;
+import reactor.fn.dispatch.RingBufferDispatcher;
 
 /**
  * @author Jon Brisbin
@@ -44,7 +45,7 @@ public class WebSocketTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-		final Reactor serverReactor = new Reactor(Context.rootDispatcher());
+		final Reactor serverReactor = new Reactor(new RingBufferDispatcher());
 
 
 		// Create a single key and Selector for efficiency

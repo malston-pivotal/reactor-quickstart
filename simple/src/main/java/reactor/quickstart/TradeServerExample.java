@@ -23,7 +23,7 @@ public class TradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the default Dispatcher
-		Reactor reactor = R.create();
+		Reactor reactor = new Reactor();
 
 		String topic = "trade.execute";
 
