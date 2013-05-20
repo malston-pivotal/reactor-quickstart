@@ -22,6 +22,7 @@ import reactor.core.Context;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
+import reactor.fn.Registration;
 import reactor.fn.Selector;
 
 import javax.servlet.http.HttpServlet;
@@ -30,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static reactor.Fn.$;
 
@@ -69,6 +71,7 @@ public class WebSocketTradeServerExample {
 					public Object createWebSocket(UpgradeRequest req, UpgradeResponse resp) {
 						return new WebSocketListener() {
 							AtomicLong counter = new AtomicLong();
+							Registration<Consumer<Event<Trade>>> registration;
 
 							@Override
 							public void onWebSocketBinary(byte[] payload, int offset, int len) {
@@ -76,13 +79,15 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketClose(int statusCode, String reason) {
+								if(registration != null)
+									registration.cancel();
 							}
 
 							@Override
 							public void onWebSocketConnect(final Session session) {
 								LOG.info("Connected a websocket client: {}", session);
 
-								serverReactor.on(tradeExecute, new Consumer<Event<Trade>>() {
+								registration = serverReactor.on(tradeExecute, new Consumer<Event<Trade>>() {
 									@Override
 									public void accept(Event<Trade> tradeEvent) {
 										// Send a message every 1000th trade.
@@ -100,6 +105,8 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketError(Throwable cause) {
+								if(registration != null)
+									registration.cancel();
 							}
 
 							@Override
