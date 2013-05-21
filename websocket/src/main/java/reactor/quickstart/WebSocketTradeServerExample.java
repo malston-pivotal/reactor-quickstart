@@ -45,7 +45,9 @@ public class WebSocketTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-		final Reactor serverReactor = new Reactor(new RingBufferDispatcher());
+        RingBufferDispatcher dispatcher = new RingBufferDispatcher();
+        final Reactor serverReactor = new Reactor(dispatcher);
+        dispatcher.start();
 
 
 		// Create a single key and Selector for efficiency
