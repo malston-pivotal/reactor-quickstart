@@ -2,6 +2,8 @@
 
 These examples are just some quick sketches of what you can do with Reactor. They show how to consume events, how to publish them, how to use different Dispatchers for different processing tasks, and how to compose actions around data streams.
 
+[![Build Status](https://drone.io/github.com/reactor/reactor-quickstart/status.png)](https://drone.io/github.com/reactor/reactor-quickstart/latest)
+
 ### Build
 
     git clone git@github.com:reactor/reactor-quickstart.git
