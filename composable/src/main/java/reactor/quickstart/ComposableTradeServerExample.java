@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author Jon Brisbin
+ * @author Stephane Maldini
  */
 public class ComposableTradeServerExample {
 
@@ -16,7 +17,7 @@ public class ComposableTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Rather than handling Trades as events, each Trade is accessible via Composable.
-		Composable<Trade> trades = new Composable<>();
+		Composable<Trade> trades = Composable.create();
 		// We can always set a length to a Composable if we know it (completely optional).
 		trades.setExpectedAcceptCount(totalTrades);
 
