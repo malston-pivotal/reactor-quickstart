@@ -85,7 +85,7 @@ def customizePom(def pom, def gradleProject) {
                 }
             }
             scm {
-                url = 'https://github.com/SpringSource/reactor'
+                url = 'https://github.com/reactor/reactor-quickstart'
                 connection = 'scm:git:git://github.com/reactor/reactor-quickstart'
                 developerConnection = 'scm:git:git://github.com/reactor/reactor-quickstart'
             }
