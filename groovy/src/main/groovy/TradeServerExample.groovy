@@ -4,6 +4,8 @@
 
 
 import groovy.transform.CompileStatic
+import reactor.core.Environment
+import reactor.core.R
 import reactor.core.Reactor
 import reactor.quickstart.Trade
 import reactor.quickstart.TradeServer
@@ -39,7 +41,7 @@ void test() {
 	def server = new TradeServer()
 
 	// Use a Reactor to dispatch events using the default Dispatcher
-	def reactor = new Reactor()
+	def reactor = R.reactor().using(new Environment()).ringBuffer().get()
 
 	def topic = 'trade.execute'
 

@@ -3,6 +3,7 @@ package reactor.quickstart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.Composable;
+import reactor.core.R;
 import reactor.fn.Function;
 
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,7 @@ public class ComposableTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Rather than handling Trades as events, each Trade is accessible via Composable.
-		Composable<Trade> trades = Composable.create();
+		Composable<Trade> trades = R.<Trade>compose().get();
 		// We can always set a length to a Composable if we know it (completely optional).
 		trades.setExpectedAcceptCount(totalTrades);
 

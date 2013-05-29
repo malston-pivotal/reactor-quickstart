@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reactor.Fn;
+import reactor.core.Environment;
+import reactor.core.R;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
@@ -45,9 +47,7 @@ public class WebSocketTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-        RingBufferDispatcher dispatcher = new RingBufferDispatcher();
-        final Reactor serverReactor = new Reactor(dispatcher);
-        dispatcher.start();
+		final Reactor serverReactor = R.reactor().using(new Environment()).ringBuffer().get();
 
 
 		// Create a single key and Selector for efficiency
@@ -82,7 +82,7 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketClose(int statusCode, String reason) {
-								if(registration != null)
+								if (registration != null)
 									registration.cancel();
 							}
 
@@ -108,7 +108,7 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketError(Throwable cause) {
-								if(registration != null)
+								if (registration != null)
 									registration.cancel();
 							}
 
