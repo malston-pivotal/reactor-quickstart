@@ -2,8 +2,8 @@ package reactor.quickstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.Composable;
-import reactor.core.R;
+import reactor.core.Stream;
+import reactor.core.Streams;
 import reactor.fn.Function;
 
 import java.util.concurrent.TimeUnit;
@@ -12,18 +12,18 @@ import java.util.concurrent.TimeUnit;
  * @author Jon Brisbin
  * @author Stephane Maldini
  */
-public class ComposableTradeServerExample {
+public class StreamTradeServerExample {
 
 	public static void main(String[] args) throws InterruptedException {
 		final TradeServer server = new TradeServer();
 
 		// Rather than handling Trades as events, each Trade is accessible via Composable.
-		Composable<Trade> trades = R.<Trade>compose().get();
+		Stream<Trade> trades = Streams.<Trade>defer().get();
 		// We can always set a length to a Composable if we know it (completely optional).
 		trades.setExpectedAcceptCount(totalTrades);
 
 		// We compose an action to turn a Trade into an Order by calling server.execute(Trade).
-		Composable<Order> orders = trades.map(new Function<Trade, Order>() {
+		Stream<Order> orders = trades.map(new Function<Trade, Order>() {
 			@Override
 			public Order apply(Trade trade) {
 				return server.execute(trade);
@@ -64,7 +64,7 @@ public class ComposableTradeServerExample {
 		LOG.info("Executed {} trades/sec in {}ms", (int) throughput, (int) elapsed);
 	}
 
-	private static final Logger LOG         = LoggerFactory.getLogger(ComposableTradeServerExample.class);
+	private static final Logger LOG         = LoggerFactory.getLogger(StreamTradeServerExample.class);
 	private static       int    totalTrades = 5000000;
 	private static long   startTime;
 	private static long   endTime;

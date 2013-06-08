@@ -3,12 +3,12 @@ package reactor.quickstart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.Fn;
+import reactor.R;
 import reactor.core.Environment;
-import reactor.core.R;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
-import reactor.fn.Selector;
+
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class TradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the default Dispatcher
-		Reactor reactor =  R.reactor().using(new Environment()).ringBuffer().get();
+		Reactor reactor =  R.reactor().using(new Environment()).dispatcher("ringBuffer").get();
 
 		String topic = "trade.execute";
 
@@ -48,7 +48,7 @@ public class TradeServerExample {
 			Trade t = server.nextTrade();
 
 			// Notify the Reactor the event is ready to be handled
-			reactor.notify(topic, Fn.event(t));
+			reactor.notify(topic, Event.wrap(t));
 		}
 
 		// Stop throughput timer and output metrics

@@ -30,13 +30,12 @@ import org.slf4j.LoggerFactory;
 
 import reactor.Fn;
 import reactor.core.Environment;
-import reactor.core.R;
+import reactor.R;
 import reactor.core.Reactor;
 import reactor.fn.Consumer;
 import reactor.fn.Event;
-import reactor.fn.Registration;
-import reactor.fn.Selector;
-import reactor.fn.dispatch.RingBufferDispatcher;
+import reactor.fn.registry.Registration;
+import reactor.fn.selector.Selector;
 
 /**
  * @author Jon Brisbin
@@ -47,7 +46,7 @@ public class WebSocketTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-		final Reactor serverReactor = R.reactor().using(new Environment()).ringBuffer().get();
+		final Reactor serverReactor = R.reactor().using(new Environment()).dispatcher("ringBuffer").get();
 
 
 		// Create a single key and Selector for efficiency
@@ -135,7 +134,7 @@ public class WebSocketTradeServerExample {
 			Trade t = server.nextTrade();
 
 			// Notify the Reactor the event is ready to be handled
-			serverReactor.notify(tradeExecuteKey, Fn.event(t));
+			serverReactor.notify(tradeExecuteKey, Event.wrap(t));
 		}
 
 		// Stop throughput timer and output metrics
