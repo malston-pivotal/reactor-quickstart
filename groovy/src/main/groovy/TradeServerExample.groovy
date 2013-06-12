@@ -37,10 +37,11 @@ void test() {
 		println "Executed ${(int) throughput} trades/sec in $elapsed ms"
 	}
 
+	def env = new Environment()
 	def server = new TradeServer()
 
 	// Use a Reactor to dispatch events using the default Dispatcher
-	def reactor = R.reactor().using(new Environment()).dispatcher("ringBuffer").get()
+	def reactor = R.reactor().using(env).dispatcher(Environment.RING_BUFFER).get()
 
 	def topic = 'trade.execute'
 

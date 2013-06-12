@@ -21,10 +21,14 @@ import static reactor.Fn.$;
 public class TradeServerExample {
 
 	public static void main(String[] args) throws InterruptedException {
+		Environment env = new Environment();
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the default Dispatcher
-		Reactor reactor =  R.reactor().using(new Environment()).dispatcher("ringBuffer").get();
+		Reactor reactor = R.reactor()
+											 .using(env)
+											 .dispatcher("ringBuffer")
+											 .get();
 
 		String topic = "trade.execute";
 
@@ -74,7 +78,7 @@ public class TradeServerExample {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TradeServerExample.class);
 	private static CountDownLatch latch;
-	private static int totalTrades = 5000000;
+	private static int totalTrades = 10000000;
 	private static long   startTime;
 	private static long   endTime;
 	private static double elapsed;

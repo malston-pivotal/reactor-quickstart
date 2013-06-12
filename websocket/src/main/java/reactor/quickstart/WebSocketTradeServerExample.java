@@ -7,6 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.HttpServlet;
 
@@ -36,6 +37,7 @@ import reactor.fn.Consumer;
 import reactor.fn.Event;
 import reactor.fn.registry.Registration;
 import reactor.fn.selector.Selector;
+import reactor.io.Buffer;
 
 /**
  * @author Jon Brisbin
@@ -43,11 +45,14 @@ import reactor.fn.selector.Selector;
 public class WebSocketTradeServerExample {
 
 	public static void main(String[] args) throws Exception {
+		Environment env = new Environment();
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-		final Reactor serverReactor = R.reactor().using(new Environment()).dispatcher("ringBuffer").get();
-
+		final Reactor serverReactor = R.reactor()
+																	 .using(env)
+																	 .dispatcher(Environment.RING_BUFFER)
+																	 .get();
 
 		// Create a single key and Selector for efficiency
 		final String tradeExecuteKey = "trade.execute";
@@ -73,7 +78,6 @@ public class WebSocketTradeServerExample {
 					public Object createWebSocket(UpgradeRequest req, UpgradeResponse resp) {
 						return new WebSocketListener() {
 							AtomicLong counter = new AtomicLong();
-							Registration<Consumer<Event<Trade>>> registration;
 
 							@Override
 							public void onWebSocketBinary(byte[] payload, int offset, int len) {
@@ -81,24 +85,30 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketClose(int statusCode, String reason) {
-								if (registration != null)
-									registration.cancel();
 							}
 
 							@Override
 							public void onWebSocketConnect(final Session session) {
 								LOG.info("Connected a websocket client: {}", session);
 
-								registration = serverReactor.on(tradeExecute, new Consumer<Event<Trade>>() {
+								// Keep track of a rolling average
+								final AtomicReference<Float> avg = new AtomicReference<>(0f);
+
+								serverReactor.on(tradeExecute, new Consumer<Event<Trade>>() {
 									@Override
 									public void accept(Event<Trade> tradeEvent) {
-										// Send a message every 1000th trade.
-										// If not, we completely overwhelm the browser and network.
+										Trade t = tradeEvent.getData();
+										avg.set((avg.get() + t.getPrice()) / 2);
+
+										// Send a message every 500th trade.
+										// Otherwise, we completely overwhelm the browser and network.
 										if (counter.incrementAndGet() % 1000 == 0) {
 											try {
-												session.getRemote().sendString(tradeEvent.getData().toString());
+												session.getRemote().sendString(String.format("avg: %s", avg.get()));
 											} catch (IOException e) {
-												e.printStackTrace();
+												if (!"Failed to write bytes".equals(e.getMessage())) {
+													e.printStackTrace();
+												}
 											}
 										}
 									}
@@ -107,8 +117,6 @@ public class WebSocketTradeServerExample {
 
 							@Override
 							public void onWebSocketError(Throwable cause) {
-								if (registration != null)
-									registration.cancel();
 							}
 
 							@Override
@@ -121,9 +129,9 @@ public class WebSocketTradeServerExample {
 		};
 		serve(wss);
 
-		LOG.info("Connect websocket clients now (waiting for 20 seconds).");
-		LOG.info("Open websockets/src/main/webapp/ws.html in a browser...");
-		Thread.sleep(20000);
+		LOG.info("Connect websocket clients now (waiting for 20 seconds).\n"
+								 + "Open websockets/src/main/webapp/ws.html in a browser...");
+		Thread.sleep(10000);
 
 		// Start a throughput timer
 		startTimer();
@@ -191,7 +199,7 @@ public class WebSocketTradeServerExample {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebSocketTradeServerExample.class);
 	private static CountDownLatch latch;
-	private static int totalTrades = 5000000;
+	private static int totalTrades = 10000000;
 	private static long   startTime;
 	private static long   endTime;
 	private static double elapsed;

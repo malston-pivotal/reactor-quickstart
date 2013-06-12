@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,12 +16,19 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TradeServer {
 
-	private static final Logger               LOG        = LoggerFactory.getLogger(TradeServer.class);
-	private static final String               CHARS      = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private static final int                  LEN        = CHARS.length();
-	private final        Random               random     = new Random();
-	private final        AtomicLong           counter    = new AtomicLong();
-	private final        Thread               queueDrain = new Thread() {
+	private static final Random   RANDOM  = new Random();
+	private static final String   CHARS   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final int      LEN     = CHARS.length();
+	private static final String[] SYMBOLS = new String[1000];
+
+	static {
+		for (int i = 0; i < SYMBOLS.length; i++) {
+			SYMBOLS[i] = nextSymbol();
+		}
+	}
+
+	private final AtomicLong           counter    = new AtomicLong();
+	private final Thread               queueDrain = new Thread() {
 		@Override
 		public void run() {
 			while (active.get()) {
@@ -34,9 +42,9 @@ public class TradeServer {
 			}
 		}
 	};
-	final                BlockingQueue<Order> buys       = new LinkedBlockingQueue<Order>();
-	final                BlockingQueue<Order> sells      = new LinkedBlockingQueue<Order>();
-	final                AtomicBoolean        active     = new AtomicBoolean(true);
+	final         BlockingQueue<Order> buys       = new LinkedTransferQueue<Order>();
+	final         BlockingQueue<Order> sells      = new LinkedTransferQueue<Order>();
+	final         AtomicBoolean        active     = new AtomicBoolean(true);
 
 	public TradeServer() {
 		queueDrain.start();
@@ -61,22 +69,22 @@ public class TradeServer {
 
 	public Trade nextTrade() {
 		return new Trade(counter.incrementAndGet())
-				.setSymbol(nextSymbol())
-				.setQuantity(random.nextInt(500))
-				.setPrice(Float.parseFloat(random.nextInt(700) + "." + random.nextInt(99)))
-				.setType((random.nextInt() % 2 == 0 ? Type.BUY : Type.SELL));
+				.setSymbol(SYMBOLS[RANDOM.nextInt(SYMBOLS.length)])
+				.setQuantity(RANDOM.nextInt(500))
+				.setPrice(Float.parseFloat(RANDOM.nextInt(700) + "." + RANDOM.nextInt(99)))
+				.setType((RANDOM.nextInt() % 2 == 0 ? Type.BUY : Type.SELL));
 	}
 
 	public void stop() {
 		active.set(false);
 	}
 
-	private String nextSymbol() {
-		StringBuilder sb = new StringBuilder();
+	private static String nextSymbol() {
+		char[] chars = new char[4];
 		for (int i = 0; i < 4; i++) {
-			sb.append(CHARS.charAt(random.nextInt(LEN)));
+			chars[i] = CHARS.charAt(RANDOM.nextInt(LEN));
 		}
-		return sb.toString();
+		return new String(chars);
 	}
 
 }
