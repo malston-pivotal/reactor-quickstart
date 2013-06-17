@@ -2,6 +2,7 @@ package reactor.quickstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.Environment;
 import reactor.core.Stream;
 import reactor.core.Streams;
 import reactor.fn.Function;
@@ -15,11 +16,15 @@ import java.util.concurrent.TimeUnit;
 public class StreamTradeServerExample {
 
 	public static void main(String[] args) throws InterruptedException {
+		Environment env = new Environment();
 		final TradeServer server = new TradeServer();
 
-		// Rather than handling Trades as events, each Trade is accessible via Composable.
-		Stream<Trade> trades = Streams.<Trade>defer().get();
-		// We can always set a length to a Composable if we know it (completely optional).
+		// Rather than handling Trades as events, each Trade is accessible via Stream.
+		Stream<Trade> trades = Streams.<Trade>defer()
+																	.using(env)
+																	.dispatcher(Environment.RING_BUFFER)
+																	.get();
+		// We can always set a length to a Stream if we know it (completely optional).
 		trades.setExpectedAcceptCount(totalTrades);
 
 		// We compose an action to turn a Trade into an Order by calling server.execute(Trade).
@@ -65,7 +70,7 @@ public class StreamTradeServerExample {
 	}
 
 	private static final Logger LOG         = LoggerFactory.getLogger(StreamTradeServerExample.class);
-	private static       int    totalTrades = 5000000;
+	private static       int    totalTrades = 10000000;
 	private static long   startTime;
 	private static long   endTime;
 	private static double elapsed;

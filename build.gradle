@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-description = 'Reactor Quickstart components'
+description = 'Reactor Quick-start components'
 
 ext {
 	gradleVersion = '1.6'
@@ -25,11 +25,6 @@ ext {
 	// Logging
 	slf4jVersion = '1.7.5'
 	logbackVersion = '1.0.11'
-
-	// Spring
-	springVersion = '3.2.2.RELEASE'
-	sdCommonsVersion = '1.5.1.RELEASE'
-	sdMongoVersion = '1.2.1.RELEASE'
 
 	// Jetty
 	jettyVersion = '9.0.1.v20130408'
@@ -112,7 +107,7 @@ project('groovy') {
 }
 
 project('websocket') {
-	description = 'Reactor quickstart websocket example'
+	description = 'Reactor quick-start websocket example'
 	dependencies {
 		compile project(':core')
 

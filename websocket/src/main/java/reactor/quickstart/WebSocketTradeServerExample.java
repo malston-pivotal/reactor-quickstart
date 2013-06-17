@@ -100,7 +100,7 @@ public class WebSocketTradeServerExample {
 										Trade t = tradeEvent.getData();
 										avg.set((avg.get() + t.getPrice()) / 2);
 
-										// Send a message every 500th trade.
+										// Send a message every 1000th trade.
 										// Otherwise, we completely overwhelm the browser and network.
 										if (counter.incrementAndGet() % 1000 == 0) {
 											try {

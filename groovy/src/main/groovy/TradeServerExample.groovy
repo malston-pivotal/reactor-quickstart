@@ -17,7 +17,7 @@ import static reactor.Fn.$
 @CompileStatic
 void test() {
 	CountDownLatch latch
-	int totalTrades = 5000000
+	int totalTrades = 10000000
 	long startTime
 	long endTime
 	double elapsed
