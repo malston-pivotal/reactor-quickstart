@@ -2,11 +2,14 @@ package reactor.quickstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.Deferred;
 import reactor.core.Environment;
 import reactor.core.Stream;
 import reactor.core.Streams;
+import reactor.fn.Consumer;
 import reactor.fn.Function;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,15 +23,15 @@ public class StreamTradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Rather than handling Trades as events, each Trade is accessible via Stream.
-		Stream<Trade> trades = Streams.<Trade>defer()
+		Deferred<Trade, Stream<Trade>> trades = Streams.<Trade>defer()
 																	.using(env)
 																	.dispatcher(Environment.RING_BUFFER)
+																	// We can always set a length to a Stream if we know it (completely optional).
+				                          .batch(totalTrades)
 																	.get();
-		// We can always set a length to a Stream if we know it (completely optional).
-		trades.setExpectedAcceptCount(totalTrades);
 
 		// We compose an action to turn a Trade into an Order by calling server.execute(Trade).
-		Stream<Order> orders = trades.map(new Function<Trade, Order>() {
+		Stream<Order> orders = trades.compose().map(new Function<Trade, Order>() {
 			@Override
 			public Order apply(Trade trade) {
 				return server.execute(trade);
@@ -48,7 +51,19 @@ public class StreamTradeServerExample {
 
 		// Composables can block until all values have passed through them.
 		// They know when the end has arrived because we set the length earlier.
-		orders.await(30, TimeUnit.SECONDS);
+		final CountDownLatch latch = new CountDownLatch(1);
+		orders.last().consume(new Consumer<Order>() {
+			@Override
+			public void accept(Order order) {
+				LOG.info("Finished processing");
+				latch.countDown();
+			}
+		});
+		try{
+			latch.await(30,TimeUnit.SECONDS);
+		}catch (InterruptedException e){
+			LOG.error("Failed timeout",e);
+		}
 
 		// Stop throughput timer and output metrics.
 		endTimer();
