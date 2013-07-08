@@ -6,8 +6,8 @@ import reactor.Fn;
 import reactor.R;
 import reactor.core.Environment;
 import reactor.core.Reactor;
-import reactor.fn.Consumer;
-import reactor.fn.Event;
+import reactor.event.Event;
+import reactor.function.Consumer;
 
 
 import java.util.concurrent.CountDownLatch;
@@ -26,7 +26,7 @@ public class TradeServerExample {
 
 		// Use a Reactor to dispatch events using the default Dispatcher
 		Reactor reactor = R.reactor()
-											 .using(env)
+											 .env(env)
 											 .dispatcher("ringBuffer")
 											 .get();
 

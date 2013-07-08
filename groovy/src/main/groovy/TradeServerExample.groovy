@@ -40,8 +40,8 @@ void test() {
 	def env = new Environment()
 	def server = new TradeServer()
 
-	// Use a Reactor to dispatch events using the default Dispatcher
-	def reactor = R.reactor().using(env).dispatcher(Environment.RING_BUFFER).get()
+	// Use a Reactor to dispatch events using the RingBuffer Dispatcher
+	def reactor = R.reactor().env(env).dispatcher(Environment.RING_BUFFER).get()
 
 	def topic = 'trade.execute'
 

@@ -19,6 +19,8 @@ The components include:
 * core - main components shared by all the examples
 * simple - simple event handling using a Reactor and Consumer directly
 * composable - example of using a Composable to wire components together
+* groovy - example of using the Groovy helpers to make writing Consumers easier
+* websocket - example of using the Jetty WebSocket API to write websocket-based Reactor applications
 
 ### License
 

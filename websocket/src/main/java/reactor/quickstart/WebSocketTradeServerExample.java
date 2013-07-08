@@ -33,10 +33,9 @@ import reactor.Fn;
 import reactor.core.Environment;
 import reactor.R;
 import reactor.core.Reactor;
-import reactor.fn.Consumer;
-import reactor.fn.Event;
-import reactor.fn.registry.Registration;
-import reactor.fn.selector.Selector;
+import reactor.event.Event;
+import reactor.event.selector.Selector;
+import reactor.function.Consumer;
 import reactor.io.Buffer;
 
 /**
@@ -50,7 +49,7 @@ public class WebSocketTradeServerExample {
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
 		final Reactor serverReactor = R.reactor()
-																	 .using(env)
+																	 .env(env)
 																	 .dispatcher(Environment.RING_BUFFER)
 																	 .get();
 
@@ -130,7 +129,7 @@ public class WebSocketTradeServerExample {
 		serve(wss);
 
 		LOG.info("Connect websocket clients now (waiting for 20 seconds).\n"
-								 + "Open websockets/src/main/webapp/ws.html in a browser...");
+								 + "Open websocket/src/main/webapp/ws.html in a browser...");
 		Thread.sleep(10000);
 
 		// Start a throughput timer

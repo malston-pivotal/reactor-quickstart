@@ -2,12 +2,12 @@ package reactor.quickstart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.Deferred;
 import reactor.core.Environment;
-import reactor.core.Stream;
-import reactor.core.Streams;
-import reactor.fn.Consumer;
-import reactor.fn.Function;
+import reactor.core.composable.Deferred;
+import reactor.core.composable.Stream;
+import reactor.core.composable.Streams;
+import reactor.function.Consumer;
+import reactor.function.Function;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -18,36 +18,34 @@ import java.util.concurrent.TimeUnit;
  */
 public class StreamTradeServerExample {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		Environment env = new Environment();
 		final TradeServer server = new TradeServer();
+		final CountDownLatch latch = new CountDownLatch(totalTrades);
 
 		// Rather than handling Trades as events, each Trade is accessible via Stream.
 		Deferred<Trade, Stream<Trade>> trades = Streams.<Trade>defer()
-				.using(env)
-				.dispatcher(Environment.RING_BUFFER)
-						// We can always set a length to a Stream if we know it (completely optional).
-				.batch(totalTrades)
-				.get();
+																									 .env(env)
+																									 .dispatcher(Environment.RING_BUFFER)
+																									 .batchSize(totalTrades)
+																									 .get();
 
 		// We compose an action to turn a Trade into an Order by calling server.execute(Trade).
-		Stream<Order> orders = trades.compose().map(new Function<Trade, Order>() {
-			@Override
-			public Order apply(Trade trade) {
-				return server.execute(trade);
-			}
-		});
-
-		//Consume last order and count down the current latch
-		final CountDownLatch latch = new CountDownLatch(1);
-		Stream<Order> orderLast = orders.last();
-		orderLast.consume(new Consumer<Order>() {
-			@Override
-			public void accept(Order order) {
-				LOG.info("Finished processing");
-				latch.countDown();
-			}
-		});
+		Stream<Order> orders = trades.compose().map(
+				new Function<Trade, Order>() {
+					@Override
+					public Order apply(Trade trade) {
+						return server.execute(trade);
+					}
+				}
+		).consume(
+				new Consumer<Order>() {
+					@Override
+					public void accept(Order order) {
+						latch.countDown();
+					}
+				}
+		);
 
 		// Start a throughput timer.
 		startTimer();
@@ -60,14 +58,8 @@ public class StreamTradeServerExample {
 			trades.accept(trade);
 		}
 
-		// Stream can block until all values have passed through them.
-		// They know when the end has arrived because we set the length earlier.
-		try {
-			LOG.info("Waiting...");
-			latch.await(15, TimeUnit.SECONDS);
-		} catch (Exception e) {
-			LOG.error("Failed timeout", e);
-		}
+		// Wait for all trades to pass through
+		latch.await(30, TimeUnit.SECONDS);
 
 		// Stop throughput timer and output metrics.
 		endTimer();
@@ -80,7 +72,7 @@ public class StreamTradeServerExample {
 		startTime = System.currentTimeMillis();
 	}
 
-	private static void endTimer() {
+	private static void endTimer() throws InterruptedException {
 		endTime = System.currentTimeMillis();
 		elapsed = (endTime - startTime) * 1.0;
 		throughput = totalTrades / (elapsed / 1000);
