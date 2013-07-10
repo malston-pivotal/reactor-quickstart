@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.Environment;
 import reactor.core.composable.Deferred;
 import reactor.core.composable.Stream;
-import reactor.core.composable.Streams;
+import reactor.core.composable.spec.Streams;
 import reactor.function.Consumer;
 import reactor.function.Function;
 
