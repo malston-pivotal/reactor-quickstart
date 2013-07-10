@@ -16,7 +16,7 @@
 description = 'Reactor Quick-start components'
 
 ext {
-	gradleVersion = '1.6'
+	gradleVersion = '1.7-rc-1'
 	gradleScriptDir = "${rootProject.projectDir}/gradle"
 
 	// Languages
@@ -24,10 +24,13 @@ ext {
 
 	// Logging
 	slf4jVersion = '1.7.5'
-	logbackVersion = '1.0.11'
+	logbackVersion = '1.0.13'
 
 	// Jetty
 	jettyVersion = '9.0.1.v20130408'
+
+  // Reactor
+  reactorVersion = '1.0.0.BUILD-SNAPSHOT'
 
 	// Testing
 	spockVersion = '0.7-groovy-2.0'
@@ -43,12 +46,12 @@ allprojects {
 		exclude module: 'junit'
 	}
 
-	group = 'reactor.quickstart'
+	group = 'org.projectreactor.quickstart'
 	repositories {
 		mavenLocal()
+    mavenCentral()
 		maven { url 'http://repo.springsource.org/libs-release' }
 		maven { url 'http://repo.springsource.org/libs-snapshot' }
-		mavenCentral()
 	}
 }
 
@@ -68,7 +71,7 @@ subprojects { subproject ->
 		runtime "ch.qos.logback:logback-classic:$logbackVersion"
 
 		// Reactor
-		compile 'reactor:reactor-core:1.0.0.BUILD-SNAPSHOT'
+		compile "org.projectreactor:reactor-core:$reactorVersion"
 
 		// Testing
 		testCompile 'junit:junit-dep:4.11'
@@ -102,7 +105,7 @@ project('groovy') {
 	dependencies {
 		compile project(':core')
 
-		compile 'reactor:reactor-groovy:1.0.0.BUILD-SNAPSHOT'
+		compile "org.projectreactor:reactor-groovy:$reactorVersion"
 	}
 }
 
