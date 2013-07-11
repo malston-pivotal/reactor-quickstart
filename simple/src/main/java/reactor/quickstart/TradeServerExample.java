@@ -1,19 +1,17 @@
 package reactor.quickstart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.Fn;
-import reactor.R;
-import reactor.core.Environment;
-import reactor.core.Reactor;
-import reactor.event.Event;
-import reactor.function.Consumer;
-
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static reactor.Fn.$;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import reactor.core.Environment;
+import reactor.core.Reactor;
+import reactor.core.spec.Reactors;
+import reactor.event.Event;
+import reactor.event.selector.Selectors;
+import reactor.function.Consumer;
 
 /**
  * @author Jon Brisbin
@@ -25,7 +23,7 @@ public class TradeServerExample {
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the default Dispatcher
-		Reactor reactor = R.reactor()
+		Reactor reactor = Reactors.reactor()
 											 .env(env)
 											 .dispatcher("ringBuffer")
 											 .get();
@@ -33,7 +31,7 @@ public class TradeServerExample {
 		String topic = "trade.execute";
 
 		// For each Trade event, execute that on the server
-		reactor.on($(topic), new Consumer<Event<Trade>>() {
+		reactor.on(Selectors.object(topic), new Consumer<Event<Trade>>() {
 			@Override
 			public void accept(Event<Trade> tradeEvent) {
 				server.execute(tradeEvent.getData());

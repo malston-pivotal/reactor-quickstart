@@ -1,7 +1,5 @@
 package reactor.quickstart;
 
-import static reactor.Fn.$;
-
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -29,33 +27,40 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import reactor.Fn;
 import reactor.core.Environment;
-import reactor.R;
 import reactor.core.Reactor;
+import reactor.core.spec.Reactors;
 import reactor.event.Event;
 import reactor.event.selector.Selector;
+import reactor.event.selector.Selectors;
 import reactor.function.Consumer;
-import reactor.io.Buffer;
 
 /**
  * @author Jon Brisbin
  */
 public class WebSocketTradeServerExample {
 
+	private static final Logger LOG = LoggerFactory.getLogger(WebSocketTradeServerExample.class);
+	private static CountDownLatch latch;
+	private static int totalTrades = 10000000;
+	private static long   startTime;
+	private static long   endTime;
+	private static double elapsed;
+	private static double throughput;
+
 	public static void main(String[] args) throws Exception {
 		Environment env = new Environment();
 		final TradeServer server = new TradeServer();
 
 		// Use a Reactor to dispatch events using the high-speed Dispatcher
-		final Reactor serverReactor = R.reactor()
+		final Reactor serverReactor = Reactors.reactor()
 																	 .env(env)
 																	 .dispatcher(Environment.RING_BUFFER)
 																	 .get();
 
 		// Create a single key and Selector for efficiency
 		final String tradeExecuteKey = "trade.execute";
-		final Selector tradeExecute = $(tradeExecuteKey);
+		final Selector tradeExecute = Selectors.object(tradeExecuteKey);
 
 		// For each Trade event, execute that on the server and notify connected clients
 		// because each client that connects links to the serverReactor
@@ -69,6 +74,7 @@ public class WebSocketTradeServerExample {
 			}
 		});
 
+		@SuppressWarnings("serial")
 		WebSocketServlet wss = new WebSocketServlet() {
 			@Override
 			public void configure(WebSocketServletFactory factory) {
@@ -195,13 +201,5 @@ public class WebSocketTradeServerExample {
 		server.setHandler(handler);
 		server.start();
 	}
-
-	private static final Logger LOG = LoggerFactory.getLogger(WebSocketTradeServerExample.class);
-	private static CountDownLatch latch;
-	private static int totalTrades = 10000000;
-	private static long   startTime;
-	private static long   endTime;
-	private static double elapsed;
-	private static double throughput;
 
 }

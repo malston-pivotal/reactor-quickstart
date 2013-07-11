@@ -1,11 +1,8 @@
 package reactor.quickstart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,11 +29,10 @@ public class TradeServer {
 		@Override
 		public void run() {
 			while (active.get()) {
-				Order o;
 				try {
 					// Pull Orders off the queue and process them
-					o = buys.poll(100, TimeUnit.MILLISECONDS);
-					o = sells.poll(100, TimeUnit.MILLISECONDS);
+					buys.poll(100, TimeUnit.MILLISECONDS);
+					sells.poll(100, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
 				}
 			}

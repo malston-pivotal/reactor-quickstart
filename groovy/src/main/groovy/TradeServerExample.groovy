@@ -3,16 +3,16 @@
  */
 
 
+import reactor.event.selector.Selectors
 import groovy.transform.CompileStatic
-import reactor.core.Environment
-import reactor.R
-import reactor.quickstart.Trade
-import reactor.quickstart.TradeServer
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-import static reactor.Fn.$
+import reactor.core.Environment
+import reactor.core.spec.Reactors
+import reactor.quickstart.Trade
+import reactor.quickstart.TradeServer
 
 @CompileStatic
 void test() {
@@ -41,12 +41,12 @@ void test() {
 	def server = new TradeServer()
 
 	// Use a Reactor to dispatch events using the RingBuffer Dispatcher
-	def reactor = R.reactor().env(env).dispatcher(Environment.RING_BUFFER).get()
+	def reactor = Reactors.reactor().env(env).dispatcher(Environment.RING_BUFFER).get()
 
 	def topic = 'trade.execute'
 
 	// For each Trade event, execute that on the server
-	reactor.on($(topic)) { Trade trade ->
+	reactor.on(Selectors.object(topic)) { Trade trade ->
 		server.execute trade
 
 		// Since we're async, for this test, use a latch to tell when we're done
