@@ -16,21 +16,29 @@
 description = 'Reactor Quick-start components'
 
 ext {
-	gradleVersion = '1.7-rc-1'
+	gradleVersion = '1.7'
 	gradleScriptDir = "${rootProject.projectDir}/gradle"
 
 	// Languages
-	groovyVersion = '2.1.5'
+	groovyVersion = '2.1.7'
 
 	// Logging
 	slf4jVersion = '1.7.5'
 	logbackVersion = '1.0.13'
 
+	// Spring
+	springVersion = '4.0.0.M3'
+	springBootVersion = '0.5.0.BUILD-SNAPSHOT'
+	sdJpaVersion = '1.4.1.RELEASE'
+
 	// Jetty
 	jettyVersion = '9.0.1.v20130408'
 
-  // Reactor
-  reactorVersion = '1.0.0.BUILD-SNAPSHOT'
+	// Reactor
+	reactorVersion = '1.0.0.BUILD-SNAPSHOT'
+
+	// Hibernate
+	hibernateVersion = '4.3.0.Beta4'
 
 	// Testing
 	spockVersion = '0.7-groovy-2.0'
@@ -40,6 +48,7 @@ apply from: "$gradleScriptDir/setup.gradle"
 
 allprojects {
 	apply plugin: 'idea'
+	apply plugin: 'eclipse'
 
 	configurations.all {
 		exclude group: 'commons-logging'
@@ -49,18 +58,17 @@ allprojects {
 	group = 'org.projectreactor.quickstart'
 	repositories {
 		mavenLocal()
-    mavenCentral()
-		maven { url 'http://repo.springsource.org/libs-release' }
-		maven { url 'http://repo.springsource.org/libs-snapshot' }
+		maven { url 'http://repository.jboss.org/nexus/content/groups/public' }
+		maven { url 'http://repo.spring.io/libs-snapshot' }
+		mavenCentral()
 	}
 }
 
 subprojects { subproject ->
 	apply plugin: 'java'
-	apply plugin: 'eclipse'
 
-	sourceCompatibility = 7
-	targetCompatibility = 7
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
 
 	[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none', '-g']
 
@@ -102,22 +110,53 @@ project('composable') {
 
 project('groovy') {
 	description = 'Reactor quickstart Groovy example'
+
+	apply plugin: 'groovy'
+
 	dependencies {
 		compile project(':core')
 
-		compile "org.projectreactor:reactor-groovy:$reactorVersion"
+		// Groovy
+		compile "org.codehaus.groovy:groovy-all:$groovyVersion",
+				"org.projectreactor:reactor-groovy:$reactorVersion"
 	}
 }
 
 project('websocket') {
-	description = 'Reactor quick-start websocket example'
+	description = 'Reactor quickstart websocket example'
 	dependencies {
 		compile project(':core')
 
 		// WebSocket support
-		compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
-		compile "org.eclipse.jetty.websocket:websocket-server:$jettyVersion"
+		compile "org.eclipse.jetty:jetty-servlet:$jettyVersion",
+				"org.eclipse.jetty.websocket:websocket-server:$jettyVersion"
 		compile("javax.net.websocket:javax.net.websocket-api:1.0-b08", provided)
+	}
+}
+
+project('complex') {
+	description = 'Reactor quickstart Complex example'
+	dependencies {
+		compile project(":core")
+
+		// Reactor
+		compile("org.projectreactor.data:data-spring:$reactorVersion") {
+			exclude module: 'spring-data-mongodb'
+		}
+
+		// Hibernate
+		compile "org.hibernate:hibernate-entitymanager:$hibernateVersion"
+
+		// Spring
+		compile "org.springframework.boot:spring-boot-starter-websocket:$springBootVersion",
+				"org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+
+		runtime "org.hsqldb:hsqldb:2.3.0"
+	}
+
+	task(run, dependsOn: 'classes', type: JavaExec) {
+		main = 'reactor.quickstart.complex.ComplexTradeServerExample'
+		classpath = sourceSets.main.runtimeClasspath
 	}
 }
 
