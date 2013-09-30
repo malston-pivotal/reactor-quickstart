@@ -10,7 +10,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import reactor.function.Consumer;
 import reactor.function.Function;
 import reactor.quickstart.complex.domain.Client;
-import reactor.quickstart.complex.service.ClientComposableRepository;
+import reactor.quickstart.complex.repository.ClientComposableRepository;
 
 /**
  * @author Jon Brisbin

@@ -13,7 +13,8 @@ import reactor.spring.context.config.EnableReactor;
  */
 @Configuration
 @EnableReactor
-@EnableComposableRepositories(dispatcher = Environment.RING_BUFFER)
+@EnableComposableRepositories(basePackages = {"reactor.quickstart.complex.service"},
+                              dispatcher = Environment.RING_BUFFER)
 @EnableAutoConfiguration
 @ComponentScan
 public class ComplexTradeServerExample {

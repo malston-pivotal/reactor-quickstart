@@ -1,6 +1,6 @@
-package reactor.quickstart.complex.service;
+package reactor.quickstart.complex.repository;
 
-import reactor.data.spring.ComposableCrudRepository;
+import reactor.data.core.ComposableCrudRepository;
 import reactor.quickstart.complex.domain.Client;
 
 /**

@@ -57,7 +57,7 @@ allprojects {
 
 	group = 'org.projectreactor.quickstart'
 	repositories {
-		mavenLocal()
+		//mavenLocal()
 		maven { url 'http://repository.jboss.org/nexus/content/groups/public' }
 		maven { url 'http://repo.spring.io/libs-snapshot' }
 		mavenCentral()

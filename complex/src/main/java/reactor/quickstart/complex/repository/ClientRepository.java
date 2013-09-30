@@ -1,4 +1,4 @@
-package reactor.quickstart.complex.service;
+package reactor.quickstart.complex.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import reactor.quickstart.complex.domain.Client;
