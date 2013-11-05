@@ -18,8 +18,12 @@ import reactor.quickstart.complex.repository.ClientComposableRepository;
 @Controller
 public class TradeController {
 
+	private final ClientComposableRepository clients;
+
 	@Autowired
-	private ClientComposableRepository clients;
+	public TradeController(ClientComposableRepository clients) {
+		this.clients = clients;
+	}
 
 	@RequestMapping(value = "/{clientId}", method = RequestMethod.POST)
 	@ResponseBody
