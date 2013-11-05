@@ -16,7 +16,7 @@
 description = 'Reactor Quick-start components'
 
 ext {
-	gradleVersion = '1.7'
+	gradleVersion = '1.8'
 	gradleScriptDir = "${rootProject.projectDir}/gradle"
 
 	// Languages
@@ -27,7 +27,7 @@ ext {
 	logbackVersion = '1.0.13'
 
 	// Spring
-	springVersion = '4.0.0.M3'
+	springVersion = '4.0.0.RC1'
 	springBootVersion = '0.5.0.BUILD-SNAPSHOT'
 	sdJpaVersion = '1.4.1.RELEASE'
 
